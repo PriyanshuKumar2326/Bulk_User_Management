@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const compression = require("compression");
@@ -12,9 +13,6 @@ const app = express();
 app.use(cors());
 
 
-// ======================
-// MIDDLEWARE
-// ======================
 
 // Handle large payloads (5K+ users)
 app.use(express.json({ limit: "50mb" }));
@@ -26,17 +24,13 @@ app.use(compression());
 // Route prefix
 app.use("/api/users", userRoutes);
 
-// ======================
-// HEALTH CHECK
-// ======================
+
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-// ======================
-// GLOBAL ERROR HANDLER
-// ======================
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -47,11 +41,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ======================
-// DATABASE CONNECTION
-// ======================
 
-  mongoose.connect("mongodb://127.0.0.1:27017/bulk-users")
+  mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB Connected");
   })
@@ -59,9 +50,6 @@ app.use((err, req, res, next) => {
     console.log("❌ DB Connection Error:", err.message);
   });
 
-// ======================
-// SERVER START
-// ======================
 
 const PORT = process.env.PORT || 3000;
 
